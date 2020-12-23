@@ -1,0 +1,19 @@
+
+# Azure Functions artifacts
+bin
+obj
+appsettings.json
+local.settings.json
+
+#  Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# .tfvars files
+*.tfvars
+
+# Others
+.dev
