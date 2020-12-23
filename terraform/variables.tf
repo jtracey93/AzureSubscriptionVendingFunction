@@ -18,11 +18,6 @@ variable "defaultTags" {
   }
 }
 
-variable "billingScopeResourceID" {
-  type        = string
-  description = "Resource ID of the Billing Scope for the Function App MSI to have access over."
-}
-
 variable "billingAccountID" {
   type        = string
   description = "Billing Account ID"
