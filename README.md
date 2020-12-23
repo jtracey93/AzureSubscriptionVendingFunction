@@ -113,7 +113,7 @@ The URL should look like this once constructed from the Terraform outputs: `http
 
 The Azure Function takes a simple JSON object (all entities are required) via an HTTP POST to the URL, as shown in the example below:
 
-```json
+```
 {
     "subscriptionDisplayName": "sub-name-001",
     "subscriptionBillingScope": "/providers/Microsoft.Billing/billingAccounts/XXXXXXXX/enrollmentAccounts/XXXXXX",
@@ -126,7 +126,7 @@ The Azure Function takes a simple JSON object (all entities are required) via an
 
 After a period of time, depending on if the Azure Function has had to cold start or not (as it uses the Consumption tier/SKU), you will receive a JSON response as shown in the below example:
 
-```json
+```
 {
     "subscriptionDisplayName": sub-name-001,
     "subscriptionID": xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx,
