@@ -9,4 +9,4 @@ This repository contains the below components:
 | Azure Function ZIP Archive | The ready to deploy ZIP archive of the Azure Function Source Code files as detailed above. This is used by Terraform local-exec. | [zipdeploy/](https://github.com/jtracey93/AzureSubscriptionVendingFunction/tree/master/zipdeploy) |
 
 ## Terraform Diagram
-![Terraform Diagram](./terraform/tf-graph.svg)
+![Terraform Diagram](./terraform/tf-graph.png)
