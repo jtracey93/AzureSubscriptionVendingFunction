@@ -6,7 +6,7 @@ This project hols everything you need to deploy and create an Azure Function, ba
 
 > This only works for EA (Enterprise Agreement) Customers at this time. However the code could be amended for other supported subscription types like MCA or MPA. Please create a PR on this repo if you do use and amend this code :+1:
 
-Thanks to @matt-FFFFFF for his contributions and assistance with this project!
+Thanks to [@matt-FFFFFF](https://github.com/matt-FFFFFF) for his contributions and assistance with this project!
 
 ## Roadmap
 
