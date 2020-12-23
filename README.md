@@ -6,6 +6,16 @@ This project hols everything you need to deploy and create an Azure Function, ba
 
 > This only works for EA (Enterprise Agreement) Customers at this time. However the code could be amended for other supported subscription types like MCA or MPA. Please create a PR on this repo if you do use and amend this code :+1:
 
+Thanks to @matt-FFFFFF for his contributions and assistance with this project!
+
+## Roadmap
+
+Here is what I have planned for this Azure Function. Please feel free to raise/create an issue against this repository for feature requests or feel free to contribute via a PR yourself :+1:
+
+| Item | Description | ETA |
+| :-- | :--------- | :-: |
+| Management Group Support | This involves a change from using the PowerShell Az.Subscription module to create the subscription to using ARM/REST APIs to create the subscription. | Jan 2021 |
+
 ## Components
 
 This repository contains the below components:
@@ -76,11 +86,59 @@ As you have seen from the second pre-requisite above, the EA Account ID & Billin
 
 ## Deployment Instructions
 
-cd terraform
-terraform apply
-fill out variables using previous step information
-use outputs
+1. Complete [pre-requisites](#pre-requisites)
+2. Open an InPrivate browser window. (To avoid any SSO issues)
+3. Login to the [Azure Portal](https://portal.azure.com) as the user account that meets the first pre-requisite requirement from above. (EA Account Owner & Access to Azure Subscription to deploy function too.)
+4. Open your CLI of choice (PowerShell Core, PowerShell, CMD, WSL, etc.)
+5. Login to the Azure CLI in the CLI window with the `az login --use-device-code` and following it's instructions whilst using the InPrivate browser window as per steps 2 & 3 above
+6. Change directory to the folder you cloned this git repository to as per the [pre-requisites](#pre-requisites) in the CLI window
+7. Change directory to the `terraform` folder within the cloned repository folder in the CLI window
+8. Run `terraform init`
+9. Run `terraform apply`, 
+   - You will need to enter the Enrolment Account ID & Billing Account ID gathered during the [pre-requisites](#pre-requisites) when prompted to by Terraform
+   - As well as a name prefix (keep this short (2/4 characters) and only alphanumeric characters) 
+   - And an Azure region to deploy too (all lowercase and one word - e.g. `northeurope`)
+   - Finally then approve Terraform to deploy to Azure with by entering `yes` when prompted too.
+10. Wait for Terraform to do its thing and complete, showing something similar to the below screenshot:
 
-## Terraform Diagram
+![TF Apply Complete](img/tf-apply-complete.png)
+
+## Using The Azure Function
+
+The Azure Function is accessed via the URL provided as part of the output from Terraform. It is open to requests from anywhere and has no IP restrictions in place (you can add these if you wish to the Terraform resources). However it is protected by an Azure Function Authorisation Key which must be provided as part of the URL, this is also provided as an output from Terraform upon it's completion as shown in the above in the above screenshot.
+
+The URL should look like this once constructed from the Terraform outputs: `https://<REPLACE WITH VALUE OF sub-vending-func-app-001-default-hostname OUTPUT>.azurewebsites.net/api/CreateSubs?code<REPLACE WITH VALUE OF sub-vending-func-app-001-host-default-key OUTPUT>`
+
+> You may decide to store the Azure Function Key in something like Azure Key Vault, however that is left for you to decide and adopt based on how you plan to integrate with this Azure Function.
+
+The Azure Function takes a simple JSON object (all entities are required) via an HTTP POST to the URL, as shown in the example below:
+
+```json
+{
+    "subscriptionDisplayName": "sub-name-001",
+    "subscriptionBillingScope": "/providers/Microsoft.Billing/billingAccounts/XXXXXXXX/enrollmentAccounts/XXXXXX",
+    "subscriptionOfferType": "Production"
+}
+```
+> Please change these values to match your requirements. The `subscriptionBillingScope` should use the values gathered in the pre-requisites.
+
+> The `subscriptionOfferType` accepts only either `Production` or `DevTest`
+
+After a period of time, depending on if the Azure Function has had to cold start or not (as it uses the Consumption tier/SKU), you will receive a JSON response as shown in the below example:
+
+```json
+{
+    "subscriptionDisplayName": sub-name-001,
+    "subscriptionID": xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx,
+    "subscriptionBillingScope": /providers/Microsoft.Billing/billingAccounts/XXXXXXXX/enrollmentAccounts/XXXXXX,
+    "subscriptionOfferType": Production
+}
+```
+
+Happy Subscription Creating :+1:
+
+## Terraform Resource Graph Diagram
+
+In case you want to see what Terraform is doing and creating, checkout the below diagram. Or review the HCL in the [terraform/](https://github.com/jtracey93/AzureSubscriptionVendingFunction/tree/master/terraform) directory.
 
 ![Terraform Diagram](./terraform/tf-graph.png)
