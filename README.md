@@ -33,10 +33,25 @@ choco install git -y
 The other pre-requisites are as follows:
 
 1. An Azure User account, **must be the same account**, that has access to the following:
-   1. An Active Azure Subscription with the [Contributor RBAC role assigned](https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal#add-a-role-assignment)
+   1. An Active Azure Subscription with the [Contributor RBAC role assigned](https://docs.microsoft.com/en-gb/azure/role-based-access-control/role-assignments-portal#add-a-role-assignment)
        - This Subscription will be used to deploy the Azure Function into.
-   2. An [Enterprise Agreement (EA) Account](https://docs.microsoft.com/en-us/azure/cost-management-billing/manage/ea-portal-administration#add-an-account) 
+   2. An [Enterprise Agreement (EA) Account](https://docs.microsoft.com/en-gb/azure/cost-management-billing/manage/ea-portal-administration#add-an-account) 
       - This will be the account that is used to deploy all the Subscriptions under on the EA by the Azure Function.
+      - This EA account should also have permissions to create EA Dev/Test Subscriptions. This can be done by following the process documented at: [Azure EA portal administration](https://docs.microsoft.com/en-gb/azure/cost-management-billing/manage/ea-portal-administration#enterprise-devtest-offer)
+2. The EA Account ID, Billing Account ID & Billing Scope Resource ID - See the [below section](#getting-ea-and-billing-ids) for details on how to get these
+3. Login on the same local machine to the Azure CLI with the command: `az login`
+   - To avoid SSO signing you in to the incorrect user account, open an InPrivate browser window and login to the [Azure Portal](https://portal.azure.com) as the required user account and then run `az login --use-device-code` to sign in as the correct user.
+4. [Clone](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/cloning-a-repository) this git repo to the local machine where you wish to run this deployment from.
+
+### Getting EA and Billing IDs
+
+https://github.com/Azure/Enterprise-Scale/blob/main/docs/Deploy/enable-subscription-creation.md
+## Deployment Instructions
+
+cd terraform
+terraform apply
+fill out variables using previous step information
+use outputs
 
 ## Terraform Diagram
 
