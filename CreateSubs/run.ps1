@@ -43,10 +43,10 @@ if ($subscriptionID) {
     $status = [HttpStatusCode]::OK
     $JSONResponse = @"
     {
-        "subscriptionDisplayName": $subscriptionDisplayName,
-        "subscriptionID": $subscriptionID,
-        "subscriptionBillingScope": $subscriptionBillingScope,
-        "subscriptionOfferType": $subscriptionOfferType
+        "subscriptionDisplayName": "$subscriptionDisplayName",
+        "subscriptionID": "$subscriptionID",
+        "subscriptionBillingScope": "$subscriptionBillingScope",
+        "subscriptionOfferType": "$subscriptionOfferType"
     }
 "@
 }

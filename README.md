@@ -128,10 +128,10 @@ After a period of time, depending on if the Azure Function has had to cold start
 
 ```
 {
-    "subscriptionDisplayName": sub-name-001,
-    "subscriptionID": xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx,
-    "subscriptionBillingScope": /providers/Microsoft.Billing/billingAccounts/XXXXXXXX/enrollmentAccounts/XXXXXX,
-    "subscriptionOfferType": Production
+    "subscriptionDisplayName": "sub-name-001",
+    "subscriptionID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "subscriptionBillingScope": "/providers/Microsoft.Billing/billingAccounts/XXXXXXXX/enrollmentAccounts/XXXXXX",
+    "subscriptionOfferType": "Production"
 }
 ```
 
