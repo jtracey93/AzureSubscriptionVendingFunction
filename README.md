@@ -1,6 +1,6 @@
 # Azure Subscription Vending Function - Azure Function (PowerShell Core)
 
-This project hols everything you need to deploy and create an Azure Function, based on PowerShell Core, to assist in provisioning Azure EA (Enterprise Agreement) Subscriptions programmatically in an API style. This was born from working with customers primarily creating Enterprise Scale Landing Zones with Terraform as there is no resource for creating subscriptions within the Terraform AzureRM provider at this time.
+This project holds everything you need to deploy and create an Azure Function, based on PowerShell Core, to assist in provisioning Azure EA (Enterprise Agreement) Subscriptions programmatically in an API style. This was born from working with customers primarily creating Enterprise Scale Landing Zones with Terraform as there is no resource for creating subscriptions within the Terraform AzureRM provider at this time.
 
 > There is an open GitHub issue on the Terraform AzureRM provider repository to enable subscription creation via Terraform. [Issue Number 1216](https://github.com/terraform-providers/terraform-provider-azurerm/issues/1216)
 
