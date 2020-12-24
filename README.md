@@ -8,6 +8,12 @@ This project hols everything you need to deploy and create an Azure Function, ba
 
 Thanks to [@matt-FFFFFF](https://github.com/matt-FFFFFF) for his contributions and assistance with this project!
 
+## Changelog
+
+| Version | Date | Notes |
+| :-----: | :--: | :---: |
+| V1.0.1  | 24/12/2020 | Added missing double quotes to functions JSON response. |
+
 ## Roadmap
 
 Here is what I have planned for this Azure Function. Please feel free to raise/create an issue against this repository for feature requests or feel free to contribute via a PR yourself :+1:
@@ -113,7 +119,7 @@ The URL should look like this once constructed from the Terraform outputs: `http
 
 The Azure Function takes a simple JSON object (all entities are required) via an HTTP POST to the URL, as shown in the example below:
 
-```
+```json
 {
     "subscriptionDisplayName": "sub-name-001",
     "subscriptionBillingScope": "/providers/Microsoft.Billing/billingAccounts/XXXXXXXX/enrollmentAccounts/XXXXXX",
@@ -126,12 +132,12 @@ The Azure Function takes a simple JSON object (all entities are required) via an
 
 After a period of time, depending on if the Azure Function has had to cold start or not (as it uses the Consumption tier/SKU), you will receive a JSON response as shown in the below example:
 
-```
+```json
 {
-    "subscriptionDisplayName": sub-name-001,
-    "subscriptionID": xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx,
-    "subscriptionBillingScope": /providers/Microsoft.Billing/billingAccounts/XXXXXXXX/enrollmentAccounts/XXXXXX,
-    "subscriptionOfferType": Production
+    "subscriptionDisplayName": "sub-name-001",
+    "subscriptionID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "subscriptionBillingScope": "/providers/Microsoft.Billing/billingAccounts/XXXXXXXX/enrollmentAccounts/XXXXXX",
+    "subscriptionOfferType": "Production"
 }
 ```
 
