@@ -13,6 +13,7 @@ Thanks to [@matt-FFFFFF](https://github.com/matt-FFFFFF) for his contributions a
 | Version | Date | Notes |
 | :-----: | :--: | :---: |
 | V1.0.1  | 24/12/2020 | Added missing double quotes to functions JSON response. |
+| V2 | 29/12/2020 | Migrated to Subscription Alias REST PUT API deployment via `Invoke-AzRestMethod` command from PowerShell Modules, to enable Management Group support & Azure Policy Benefits
 
 ## Roadmap
 
@@ -20,7 +21,7 @@ Here is what I have planned for this Azure Function. Please feel free to raise/c
 
 | Item | Description | ETA |
 | :-- | :--------- | :-: |
-| Management Group Support | This involves a change from using the PowerShell Az.Subscription module to create the subscription to using ARM/REST APIs to create the subscription. | Jan 2021 |
+| ~~Management Group Support~~ | ~~This involves a change from using the PowerShell Az.Subscription module to create the subscription to using ARM/REST APIs to create the subscription.~~ | Completed and released in V2 - Dec 2020 :heavy_check_mark: |
 
 ## Components
 
@@ -62,17 +63,20 @@ The other pre-requisites are as follows:
    2. An [Enterprise Agreement (EA) Account](https://docs.microsoft.com/en-gb/azure/cost-management-billing/manage/ea-portal-administration#add-an-account) 
       - This will be the account that is used to deploy all the Subscriptions under on the EA by the Azure Function.
       - This EA account should also have permissions to create EA Dev/Test Subscriptions. This can be done by following the process documented at: [Azure EA portal administration](https://docs.microsoft.com/en-gb/azure/cost-management-billing/manage/ea-portal-administration#enterprise-devtest-offer)
+   3. ***(Optional)*** RBAC permissions on the Management Group you wish to grant the Azure Function the [Management Group Contributor](https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#management-group-contributor) RBAC role to so it can create and assign subscriptions to the desired Management Groups in your API request (RBAC inheritance will apply as normal so the Azure Function will be able to assign subscription to any Management Group either at or below the Management Group you specify at deployment time of this Azure Function). Further info on Management Group RBAC can be found [here.](https://docs.microsoft.com/en-us/azure/governance/management-groups/overview#moving-management-groups-and-subscriptions)
 2. The Enrolment Account ID & Billing Account ID - See the [below section](#getting-ea-and-billing-ids) for details on how to get these
-3. Login on the same local machine to the Azure CLI with the command: `az login`
+3. ***(Optional)*** The Management Group Name (ID) of the Management Group you wish the Azure Function to have the [Management Group Contributor](https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#management-group-contributor) RBAC role assigned at (remember inheritance will apply as per normal so best to make this assignment as high as possible beneath the Tenant Root Group) - For further information on finding this please see the [below section](#optional-finding-the-management-group-name-id)
+4. ***(Optional)*** Delete the comments in the Terraform files to enable the Management Group support - please follow the instructions in the [below section.](#optional-remove-comments-from-terraform-files-for-management-group-rbac)
+5. Login on the same local machine to the Azure CLI with the command: `az login`
    - To avoid SSO signing you in to the incorrect user account, open an InPrivate browser window and login to the [Azure Portal](https://portal.azure.com) as the required user account and then run `az login --use-device-code` to sign in as the correct user.
-4. [Clone](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/cloning-a-repository) this git repo to the local machine where you wish to run this deployment from.
+6. [Clone](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/cloning-a-repository) this git repo to the local machine where you wish to run this deployment from.
 
 ### Getting EA and Billing IDs
 
 As you have seen from the second pre-requisite above, the EA Account ID & Billing Account ID are required to be passed in as inputs to terraform variables (either at runtime or by adding default values to the corresponding variables in the 'variables.tf' file.). To find these two ID's follow the below instructions:
 
 1. Open an InPrivate browser window. (To avoid any SSO issues)
-2. Login to the [Azure Portal](https://portal.azure.com) as the user account that meets the first pre-requisite requirement from above. (EA Account Owner & Access to Azure Subscription to deploy function too.)
+2. Login to the [Azure Portal](https://portal.azure.com) as the user account that meets the first pre-requisite requirement from above. (EA Account Owner, Access to Azure Subscription to deploy function too & Management Group Owner/Contributor at the required hierarchy)
 3. Search for 'cost management' and open the 'Cost Management + Billing' blade:
 
 ![Cost Management](img/3.png)
@@ -90,18 +94,43 @@ As you have seen from the second pre-requisite above, the EA Account ID & Billin
 ](https://github.com/Azure/Enterprise-Scale/blob/main/docs/Deploy/enable-subscription-creation.md).
 > The Enterprise Scale docs also walk through finding the above required IDs via PowerShell with the AZ module and also applying the RBAC permissions. However the RBAC assignment is handled by terraform in this repository, when the 2 required IDs are passed to it.
 
+### ***(Optional)*** Finding the Management Group Name (ID)
+
+To find the Management Group Name (ID) for where you wish to allow the Azure Function to be assigned the RBAC role of [Management Group Contributor](https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#management-group-contributor), please do the following:
+
+1. Open an InPrivate browser window. (To avoid any SSO issues)
+2. Login to the [Azure Portal](https://portal.azure.com) as the user account that meets the first pre-requisite requirement from above. (EA Account Owner, Access to Azure Subscription to deploy function too & Management Group Owner/Contributor at the required hierarchy)
+3. Browse to the Management Group blade and navigate the hierarchy to the desired Management Group:
+
+![Management Group Details Button](img/mgmt-grp-1.png)
+
+4. Click on the 'details' button, as shown above
+5. On the new blade that loads, make a note of the 'ID' value (as shown highlighted below); as this is what will be required to enter as a Terraform variable later on:
+
+![Management Group ID Portal](img/mgmt-grp-2.png)
+
+### ***(Optional)*** Remove comments from Terraform files for Management Group RBAC
+
+If you wish to enable the Azure Function to create Subscriptions and assign to the desired Management Group you will need to delete the comments in the below files, once you have cloned the Git repository locally to your machine. The files to remove the comments from are below along with the line numbers to completely remove from each file to remove the comments:
+
+| File Name | Location | Line Numbers To Remove | 
+| main.tf | terraform/main.tf | Lines 78 & 88 |
+| variables.tf | terraform/variables.tf | Lines 31 & 36 |
+
+> Please remember to save the files once you have removed the comment lines before trying to continue!
+
 ## Deployment Instructions
 
 1. Complete [pre-requisites](#pre-requisites)
 2. Open an InPrivate browser window. (To avoid any SSO issues)
-3. Login to the [Azure Portal](https://portal.azure.com) as the user account that meets the first pre-requisite requirement from above. (EA Account Owner & Access to Azure Subscription to deploy function too.)
+3. Login to the [Azure Portal](https://portal.azure.com) as the user account that meets the first pre-requisite requirement from above. (EA Account Owner & Access to Azure Subscription to deploy function too &  ***(Optional)*** Management Group Owner/Contributor at the required hierarchy)
 4. Open your CLI of choice (PowerShell Core, PowerShell, CMD, WSL, etc.)
 5. Login to the Azure CLI in the CLI window with the `az login --use-device-code` and following it's instructions whilst using the InPrivate browser window as per steps 2 & 3 above
 6. Change directory to the folder you cloned this git repository to as per the [pre-requisites](#pre-requisites) in the CLI window
 7. Change directory to the `terraform` folder within the cloned repository folder in the CLI window
 8. Run `terraform init`
 9. Run `terraform apply`, 
-   - You will need to enter the Enrolment Account ID & Billing Account ID gathered during the [pre-requisites](#pre-requisites) when prompted to by Terraform
+   - You will need to enter the Enrolment Account ID & Billing Account ID (And potentially the Management Group Name (ID), if you chose to enable this as above) gathered during the [pre-requisites](#pre-requisites) when prompted to by Terraform
    - As well as a name prefix (keep this short (2/4 characters) and only alphanumeric characters) 
    - And an Azure region to deploy too (all lowercase and one word - e.g. `northeurope`)
    - Finally then approve Terraform to deploy to Azure with by entering `yes` when prompted too.
@@ -117,7 +146,9 @@ The URL should look like this once constructed from the Terraform outputs: `http
 
 > You may decide to store the Azure Function Key in something like Azure Key Vault, however that is left for you to decide and adopt based on how you plan to integrate with this Azure Function.
 
-The Azure Function takes a simple JSON object (all entities are required) via an HTTP POST to the URL, as shown in the example below:
+The Azure Function takes a simple JSON object (all entities are required) via an HTTP POST to the URL, as shown in the examples below:
+
+### No/Without Management Group Assignment
 
 ```json
 {
@@ -137,7 +168,36 @@ After a period of time, depending on if the Azure Function has had to cold start
     "subscriptionDisplayName": "sub-name-001",
     "subscriptionID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
     "subscriptionBillingScope": "/providers/Microsoft.Billing/billingAccounts/XXXXXXXX/enrollmentAccounts/XXXXXX",
-    "subscriptionOfferType": "Production"
+    "subscriptionOfferType": "Production",
+    "subscriptionManagementGroupID": ""
+}
+```
+
+> As you are not specifying a Management Group as part of the Subscription creation request, it will be placed in the default Management Group (normally the Tenant Root Group, unless this has been changed as documented [here](https://docs.microsoft.com/en-us/azure/governance/management-groups/how-to/protect-resource-hierarchy#setting---default-management-group)). You can move it as you wish once the Subscription has been created.
+
+### With Management Group Assignment
+
+```json
+{
+    "subscriptionDisplayName": "sub-name-001",
+    "subscriptionBillingScope": "/providers/Microsoft.Billing/billingAccounts/XXXXXXXX/enrollmentAccounts/XXXXXX",
+    "subscriptionOfferType": "Production",
+    "subscriptionManagementGroupId": "/providers/Microsoft.Management/managementGroups/XXXXXXXX"
+}
+```
+> Please change these values to match your requirements. The `subscriptionBillingScope` should use the values gathered in the pre-requisites.
+
+> The `subscriptionOfferType` accepts only either `Production` or `DevTest`
+
+After a period of time, depending on if the Azure Function has had to cold start or not (as it uses the Consumption tier/SKU), you will receive a JSON response as shown in the below example:
+
+```json
+{
+    "subscriptionDisplayName": "sub-name-001",
+    "subscriptionID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "subscriptionBillingScope": "/providers/Microsoft.Billing/billingAccounts/XXXXXXXX/enrollmentAccounts/XXXXXX",
+    "subscriptionOfferType": "Production",
+    "subscriptionManagementGroupId": "/providers/Microsoft.Management/managementGroups/XXXXXXXX"
 }
 ```
 

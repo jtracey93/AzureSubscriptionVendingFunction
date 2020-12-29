@@ -75,6 +75,18 @@ data "azurerm_function_app_host_keys" "sub-vending-func-app-001" {
   ]
 }
 
+/* REMOVE THIS MULTI-LINE COMMENT - IF WISHING TO GRANT RBAC TO MANAGEMENT GROUP FOR AZURE FUNCTION - ALSO REMOVE IN VARIABLES.TF
+data "azurerm_management_group" "mgmt-group" {
+  name = var.managementGroupName
+}
+
+resource "azurerm_role_assignment" "sub-vending-func-app-001-rbac" {
+  principal_id         = azurerm_function_app.sub-vending-func-app-001.identity[0].principal_id
+  role_definition_name = "Management Group Contributor"
+  scope                = data.azurerm_management_group.mgmt-group.id
+}
+*/
+
 locals {
   roleAssignmentGUID = uuidv5(azurerm_function_app.sub-vending-func-app-001.identity[0].principal_id, "MSI")
 }
@@ -102,7 +114,7 @@ resource "null_resource" "deploy-function-app" {
   provisioner "local-exec" {
     command = <<EOT
 
-      az functionapp deployment source config-zip -g ${azurerm_resource_group.sub-vending-rsg-001.name} -n ${azurerm_function_app.sub-vending-func-app-001.name} --src ..\zipdeploy\Subscription-Vending-Function-v1.0.1.zip
+      az functionapp deployment source config-zip -g ${azurerm_resource_group.sub-vending-rsg-001.name} -n ${azurerm_function_app.sub-vending-func-app-001.name} --src ..\zipdeploy\Subscription-Vending-Function-v2.zip
 
     EOT
     

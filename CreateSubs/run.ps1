@@ -10,6 +10,7 @@ Write-Host "PowerShell HTTP trigger function processed a request."
 $subscriptionDisplayName = $Request.Query.subscriptionDisplayName
 $subscriptionBillingScope = $Request.Query.subscriptionBillingScope
 $subscriptionOfferType = $Request.Query.subscriptionOfferType
+$subscriptionManagementGroupId = $Request.Query.subscriptionManagementGroupId
 
 if (-not $subscriptionDisplayName) {
     $subscriptionDisplayName = $Request.Body.subscriptionDisplayName
@@ -23,36 +24,83 @@ if (-not $subscriptionOfferType) {
     $subscriptionOfferType = $Request.Body.subscriptionOfferType
 }
 
+if (-not $subscriptionManagementGroupId) {
+    $subscriptionManagementGroupId = $Request.Body.subscriptionManagementGroupId
+}
+
 ## Show Azure PowerShell Logged In User Details
 (Get-AzContext).Account
 
-## Create Subscription Alias GUID 
+## Variables
+
 $aliasGUID = New-Guid
+$putURLBase = "/providers/Microsoft.Subscription/aliases/$aliasGUID"
+$putURLAPIVersion = "/?api-version=2020-09-01"
 
-Write-Host "Creating Azure Subscription with Display Name of: $subscriptionDisplayName, At Billing Scope of: $subscriptionBillingScope, And Subscription Offer Type Of: $subscriptionOfferType..."
+## Create PUT URL From Above Variables
 
-## Create subscription
-$subscription = New-AzSubscriptionAlias -AliasName "$aliasGUID" -SubscriptionName "$subscriptionDisplayName" -BillingScope "$subscriptionBillingScope" -Workload "$subscriptionOfferType"
+$putURLComplete = $putURLBase + $putURLAPIVersion
 
-## Get subscription ID
-$subscriptionID = $subscription.Properties.SubscriptionID
+## Create Request Body Based On Whether Management Group ID Is Passed In Request Or Not
 
-Write-Host "Azure Subscription Created with ID of: $subscriptionID"
+if (-not $subscriptionManagementGroupId) {
+    
+    $putRequestBody = @"
+    {
+        "properties": {
+            "displayName": "$subscriptionDisplayName",
+            "billingScope": "$subscriptionBillingScope",
+            "workload": "$subscriptionOfferType"
+        } 
+    }
+"@
 
-if ($subscriptionID) {
+## Create Subscription And Place Into Default Management Group, As None Specified In Request
+
+Write-Host "Creating Azure Subscription via Alias of: $aliasGUID, Display Name of: $subscriptionDisplayName, At Billing Scope of: $subscriptionBillingScope, And Subscription Offer Type Of: $subscriptionOfferType"
+$newSubcription = Invoke-AzRest -Path $putURLComplete -Method PUT -Payload $putRequestBody
+
+} else {
+    
+    $putRequestBody = @"
+    {
+        "properties": {
+            "displayName": "$subscriptionDisplayName",
+            "billingScope": "$subscriptionBillingScope",
+            "workload": "$subscriptionOfferType",
+            "managementGroupId": "$subscriptionManagementGroupId"
+        } 
+    }
+"@
+
+## Create Subscription And Place Into Specified Management Group
+
+Write-Host "Creating Azure Subscription via Alias of: $aliasGUID, Display Name of: $subscriptionDisplayName, At Billing Scope of: $subscriptionBillingScope, And Subscription Offer Type Of: $subscriptionOfferType, And placing in the following Management Group: $subscriptionManagementGroupId"
+$newSubcription = Invoke-AzRest -Path $putURLComplete -Method PUT -Payload $putRequestBody
+
+}
+
+## Extract Subscription ID 
+$parsedNewSubscription = $newSubcription.Content | ConvertFrom-Json
+$newSubscriptionId = $parsedNewSubscription.properties.subscriptionId
+
+Write-Host "Azure Subscription Created with ID of: $newSubscriptionId"
+
+if ($newSubscriptionId) {
     $status = [HttpStatusCode]::OK
     $JSONResponse = @"
     {
         "subscriptionDisplayName": "$subscriptionDisplayName",
-        "subscriptionID": "$subscriptionID",
+        "subscriptionID": "$newSubscriptionId",
         "subscriptionBillingScope": "$subscriptionBillingScope",
-        "subscriptionOfferType": "$subscriptionOfferType"
+        "subscriptionOfferType": "$subscriptionOfferType",
+        "subscriptionManagementGroupID": "$subscriptionManagementGroupId"
     }
 "@
 }
 else {
     $status = [HttpStatusCode]::BadRequest
-    $JSONResponse = "Azure Subscription creation failed, please check the Azure Functions logs!"
+    $JSONResponse = "Azure Subscription creation failed, please check the Azure Function invocation logs!"
 }
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
