@@ -12,7 +12,7 @@ variable "defaultTags" {
   type = map
   default = {
     Service    = "Subscription Vending Machine"
-    Version    = "1.0"
+    Version    = "2.0"
     Repoistory = "https://github.com/jtracey93/AzureSubscriptionVendingFunction"
     IaC-Tool   = "Terraform"
   }
@@ -26,4 +26,9 @@ variable "billingAccountID" {
 variable "enrolmentAccountID" {
   type        = string
   description = "Enrollment Account ID"
+}
+
+variable "managementGroupName" {
+  type = string
+  description = "Name (ID) of the Managmenent Group you wish this Azure Function to have permissions at to enable creating and placing subscription in your Management Group hierarchy. This is the ID of the Management Group as shown in the portal e.g. not the Display Name"
 }

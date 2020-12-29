@@ -75,6 +75,16 @@ data "azurerm_function_app_host_keys" "sub-vending-func-app-001" {
   ]
 }
 
+data "azurerm_management_group" "mgmt-group" {
+  name = var.managementGroupName
+}
+
+resource "azurerm_role_assignment" "sub-vending-func-app-001-rbac" {
+  principal_id         = azurerm_function_app.sub-vending-func-app-001.identity[0].principal_id
+  role_definition_name = "Management Group Contributor"
+  scope                = data.azurerm_management_group.mgmt-group.id
+}
+
 locals {
   roleAssignmentGUID = uuidv5(azurerm_function_app.sub-vending-func-app-001.identity[0].principal_id, "MSI")
 }
