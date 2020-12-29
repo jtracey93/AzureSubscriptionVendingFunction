@@ -3,5 +3,5 @@
 #
 @{
     'Az.Subscription' = '0.8.0'
-    'Az' = '5.*'
+    'Az.Accounts' = '2.2.2'
 }

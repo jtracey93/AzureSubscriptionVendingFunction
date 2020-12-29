@@ -102,7 +102,7 @@ resource "null_resource" "deploy-function-app" {
   provisioner "local-exec" {
     command = <<EOT
 
-      az functionapp deployment source config-zip -g ${azurerm_resource_group.sub-vending-rsg-001.name} -n ${azurerm_function_app.sub-vending-func-app-001.name} --src ..\zipdeploy\Subscription-Vending-Function-v1.0.1.zip
+      az functionapp deployment source config-zip -g ${azurerm_resource_group.sub-vending-rsg-001.name} -n ${azurerm_function_app.sub-vending-func-app-001.name} --src ..\zipdeploy\Subscription-Vending-Function-v2.zip
 
     EOT
     
