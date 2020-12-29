@@ -10,6 +10,7 @@ Write-Host "PowerShell HTTP trigger function processed a request."
 $subscriptionDisplayName = $Request.Query.subscriptionDisplayName
 $subscriptionBillingScope = $Request.Query.subscriptionBillingScope
 $subscriptionOfferType = $Request.Query.subscriptionOfferType
+$managementGroupId = $Request.Query.managementGroupId
 
 if (-not $subscriptionDisplayName) {
     $subscriptionDisplayName = $Request.Body.subscriptionDisplayName
@@ -23,28 +24,54 @@ if (-not $subscriptionOfferType) {
     $subscriptionOfferType = $Request.Body.subscriptionOfferType
 }
 
+if (-not $managementGroupId) {
+    $managementGroupId = $Request.Body.managementGroupId
+}
+
 ## Show Azure PowerShell Logged In User Details
 (Get-AzContext).Account
 
-## Create Subscription Alias GUID 
+## Variables
+
 $aliasGUID = New-Guid
+$putURLBase = "/providers/Microsoft.Subscription/aliases/$aliasGUID"
+$putURLAPIVersion = "/?api-version=2020-09-01"
 
-Write-Host "Creating Azure Subscription with Display Name of: $subscriptionDisplayName, At Billing Scope of: $subscriptionBillingScope, And Subscription Offer Type Of: $subscriptionOfferType..."
+## Create PUT URL From Above Variables
 
-## Create subscription
-$subscription = New-AzSubscriptionAlias -AliasName "$aliasGUID" -SubscriptionName "$subscriptionDisplayName" -BillingScope "$subscriptionBillingScope" -Workload "$subscriptionOfferType"
+$putURLComplete = $putURLBase + $putURLAPIVersion
 
-## Get subscription ID
-$subscriptionID = $subscription.Properties.SubscriptionID
+## Create Request Body
 
-Write-Host "Azure Subscription Created with ID of: $subscriptionID"
+$putRequestBody = @"
+{
+    "properties": {
+        "displayName": "$subscriptionDisplayName",
+        "billingScope": "$subscriptionBillingScope",
+        "workload": "$subscriptionOfferType",
+        "managementGroupId": "$managementGroupId"
+    } 
+}
+"@
 
-if ($subscriptionID) {
+## Create New Subscription
+
+Write-Host "Creating Azure Subscription via Alias of: $aliasGUID, Display Name of: $subscriptionDisplayName, At Billing Scope of: $subscriptionBillingScope, And Subscription Offer Type Of: $subscriptionOfferType..."
+
+$newSubcription = Invoke-AzRest -Path $putURLComplete -Method PUT -Payload $putRequestBody
+
+## Extract Subscription ID 
+$parsedNewSubscription = $newSubcription.Content | ConvertFrom-Json
+$newSubscriptionId = $parsedNewSubscription.properties.subscriptionId
+
+Write-Host "Azure Subscription Created with ID of: $newSubscriptionId"
+
+if ($newSubscriptionId) {
     $status = [HttpStatusCode]::OK
     $JSONResponse = @"
     {
         "subscriptionDisplayName": "$subscriptionDisplayName",
-        "subscriptionID": "$subscriptionID",
+        "subscriptionID": "$newSubscriptionId",
         "subscriptionBillingScope": "$subscriptionBillingScope",
         "subscriptionOfferType": "$subscriptionOfferType"
     }
