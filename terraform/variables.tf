@@ -28,7 +28,9 @@ variable "enrolmentAccountID" {
   description = "Enrollment Account ID"
 }
 
+/* REMOVE THIS MULTI-LINE COMMENT - IF WISHING TO GRANT RBAC TO MANAGEMENT GROUP FOR AZURE FUNCTION - ALSO REMOVE IN MAIN.TF
 variable "managementGroupName" {
   type = string
   description = "Name (ID) of the Managmenent Group you wish this Azure Function to have permissions at to enable creating and placing subscription in your Management Group hierarchy. This is the ID of the Management Group as shown in the portal e.g. not the Display Name"
 }
+*/
