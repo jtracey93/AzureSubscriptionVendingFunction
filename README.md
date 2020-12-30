@@ -146,7 +146,7 @@ If you wish to enable the Azure Function to create Subscriptions and assign to t
 
 Before using the Azure Function that you have just deployed, it is important to understand what the term "Alias" in this context actually means; this will help you make a decision on how to decide what to use as your "Alias" as part of the API request.
 
-Here are some key points of information regarding the "alias":
+Here are some key points of information regarding the "Alias":
 
 - Alias must be unique within the Azure AD tenant
 - Alias ID is not the same as the Subscription ID
@@ -180,6 +180,8 @@ The Azure Function takes a simple JSON object (all entities are required) via an
 
 > Please change these values to match your requirements. The `subscriptionBillingScope` should use the values gathered in the pre-requisites.
 
+> The `subscriptionAlias` property is not required in the request body as [detailed above](#azure-subscription-alias---explained) 
+
 > The `subscriptionOfferType` accepts only either `Production` or `DevTest`
 
 After a period of time, depending on if the Azure Function has had to cold start or not (as it uses the Consumption tier/SKU), you will receive a JSON response as shown in the below example:
@@ -208,7 +210,10 @@ After a period of time, depending on if the Azure Function has had to cold start
     "subscriptionManagementGroupId": "/providers/Microsoft.Management/managementGroups/XXXXXXXX"
 }
 ```
+
 > Please change these values to match your requirements. The `subscriptionBillingScope` should use the values gathered in the pre-requisites.
+
+> The `subscriptionAlias` property is not required in the request body as [detailed above](#azure-subscription-alias---explained) 
 
 > The `subscriptionOfferType` accepts only either `Production` or `DevTest`
 
