@@ -11,6 +11,7 @@ $subscriptionDisplayName = $Request.Query.subscriptionDisplayName
 $subscriptionBillingScope = $Request.Query.subscriptionBillingScope
 $subscriptionOfferType = $Request.Query.subscriptionOfferType
 $subscriptionManagementGroupId = $Request.Query.subscriptionManagementGroupId
+$subscriptionAlias = $Request.Query.subscriptionAlias
 
 if (-not $subscriptionDisplayName) {
     $subscriptionDisplayName = $Request.Body.subscriptionDisplayName
@@ -28,13 +29,27 @@ if (-not $subscriptionManagementGroupId) {
     $subscriptionManagementGroupId = $Request.Body.subscriptionManagementGroupId
 }
 
+if (-not $subscriptionAlias) {
+    $subscriptionAlias = $Request.Body.subscriptionAlias
+}
+
 ## Show Azure PowerShell Logged In User Details
 (Get-AzContext).Account
 
+## Check If Subscription Alias Has Been Provided, If Not Create Random GUID For The Alias
+
+if (-not $subscriptionAlias) {
+
+    Write-Host "Subscription Alias not provided, will now generate a random GUID to act as Subscriptionn Alias..."
+
+    $subscriptionAlias = New-Guid
+
+}
+
 ## Variables
 
-$aliasGUID = New-Guid
-$putURLBase = "/providers/Microsoft.Subscription/aliases/$aliasGUID"
+$subscriptionAlias = New-Guid
+$putURLBase = "/providers/Microsoft.Subscription/aliases/$subscriptionAlias"
 $putURLAPIVersion = "/?api-version=2020-09-01"
 
 ## Create PUT URL From Above Variables
@@ -57,7 +72,7 @@ if (-not $subscriptionManagementGroupId) {
 
 ## Create Subscription And Place Into Default Management Group, As None Specified In Request
 
-Write-Host "Creating Azure Subscription via Alias of: $aliasGUID, Display Name of: $subscriptionDisplayName, At Billing Scope of: $subscriptionBillingScope, And Subscription Offer Type Of: $subscriptionOfferType"
+Write-Host "Creating Azure Subscription via Alias of: $subscriptionAlias, Display Name of: $subscriptionDisplayName, At Billing Scope of: $subscriptionBillingScope, And Subscription Offer Type Of: $subscriptionOfferType"
 $newSubcription = Invoke-AzRest -Path $putURLComplete -Method PUT -Payload $putRequestBody
 
 } else {
@@ -75,7 +90,7 @@ $newSubcription = Invoke-AzRest -Path $putURLComplete -Method PUT -Payload $putR
 
 ## Create Subscription And Place Into Specified Management Group
 
-Write-Host "Creating Azure Subscription via Alias of: $aliasGUID, Display Name of: $subscriptionDisplayName, At Billing Scope of: $subscriptionBillingScope, And Subscription Offer Type Of: $subscriptionOfferType, And placing in the following Management Group: $subscriptionManagementGroupId"
+Write-Host "Creating Azure Subscription via Alias of: $subscriptionAlias, Display Name of: $subscriptionDisplayName, At Billing Scope of: $subscriptionBillingScope, And Subscription Offer Type Of: $subscriptionOfferType, And placing in the following Management Group: $subscriptionManagementGroupId"
 $newSubcription = Invoke-AzRest -Path $putURLComplete -Method PUT -Payload $putRequestBody
 
 }
@@ -90,6 +105,7 @@ if ($newSubscriptionId) {
     $status = [HttpStatusCode]::OK
     $JSONResponse = @"
     {
+        "subscriptionAlias": "$subscriptionAlias",
         "subscriptionDisplayName": "$subscriptionDisplayName",
         "subscriptionID": "$newSubscriptionId",
         "subscriptionBillingScope": "$subscriptionBillingScope",
