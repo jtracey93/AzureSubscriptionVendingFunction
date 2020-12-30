@@ -14,7 +14,7 @@ Thanks to [@matt-FFFFFF](https://github.com/matt-FFFFFF) for his contributions a
 | :-----: | :--: | :---: |
 | V1.0.1  | 24/12/2020 | Added missing double quotes to functions JSON response. |
 | V2 | 29/12/2020 | Migrated to Subscription Alias REST PUT API deployment via `Invoke-AzRestMethod` command from PowerShell Modules, to enable Management Group support & Azure Policy Benefits |
-| V2.1 | 30/12/2020 | Added support to provide your own Subscription Alias (Optional). If not provided the function will randomly create a GUID with `New-Guid` |
+| V2.1 | 30/12/2020 | Added support to provide your own Subscription Alias **(Optional)**. If not provided the function will randomly create a GUID with `New-Guid` |
 
 ## Roadmap
 
@@ -144,7 +144,7 @@ If you wish to enable the Azure Function to create Subscriptions and assign to t
 
 > You do not have to provide an 'Alias' if you do not wish to, the Azure function will generate a random GUID automatically for you if you do not provide it in the API request body as detailed below and then return it to you as part of the API response.
 
-Before moving on with the deployment it is important to understand what the term "Alias" in this context actually means, this will help you make a decision on how to decide what to use as your "Alias" as part of the API request.
+Before using the Azure Function that you have just deployed, it is important to understand what the term "Alias" in this context actually means; this will help you make a decision on how to decide what to use as your "Alias" as part of the API request.
 
 Here are some key points of information regarding the "alias":
 
