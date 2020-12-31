@@ -12,7 +12,7 @@ variable "defaultTags" {
   type = map
   default = {
     Service    = "Subscription Vending Machine"
-    Version    = "2.0"
+    Version    = "2.1.1"
     Repoistory = "https://github.com/jtracey93/AzureSubscriptionVendingFunction"
     IaC-Tool   = "Terraform"
   }
