@@ -48,7 +48,6 @@ if (-not $subscriptionAlias) {
 
 ## Variables
 
-$subscriptionAlias = New-Guid
 $putURLBase = "/providers/Microsoft.Subscription/aliases/$subscriptionAlias"
 $putURLAPIVersion = "/?api-version=2020-09-01"
 
