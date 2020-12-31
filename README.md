@@ -15,6 +15,7 @@ Thanks to [@matt-FFFFFF](https://github.com/matt-FFFFFF) for his contributions a
 | V1.0.1  | 24/12/2020 | Added missing double quotes to functions JSON response. |
 | V2 | 29/12/2020 | Migrated to Subscription Alias REST PUT API deployment via `Invoke-AzRestMethod` command from PowerShell Modules, to enable Management Group support & Azure Policy Benefits |
 | V2.1 | 30/12/2020 | Added support to provide your own Subscription Alias **(Optional)**. If not provided the function will randomly create a GUID with `New-Guid` |
+| V2.1.1 | 31/12/2020 | Removed duplicate alias creation from function which lead to alias in request body being ignored |
 
 ## Roadmap
 
