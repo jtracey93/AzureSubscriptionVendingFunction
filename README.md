@@ -93,7 +93,7 @@ As you have seen from the second pre-requisite above, the EA Account ID & Billin
 ![IDs](img/5.png)
 
 > Further information on this can be found in the Enterprise Scale documentation at [Enable Service Principal to create landing zones
-](https://github.com/Azure/Enterprise-Scale/blob/main/docs/Deploy/enable-subscription-creation.md).
+](https://github.com/Azure/Enterprise-Scale/wiki/Create-Landingzones#enable-service-principal-to-create-landing-zones).
 > The Enterprise Scale docs also walk through finding the above required IDs via PowerShell with the AZ module and also applying the RBAC permissions. However the RBAC assignment is handled by terraform in this repository, when the 2 required IDs are passed to it.
 
 ### ***(Optional)*** Finding the Management Group Name (ID)
